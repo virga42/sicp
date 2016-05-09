@@ -1,4 +1,7 @@
 (load "~/bottega/sicp/ex-2.2.lisp")
+(load "~/bottega/nature/nature-sdl.lisp")
+
+(in-package :nature)
 
 (defun lerp (p0 p1 x)
   (+ (y-point p0) (* (- (y-point p1)
@@ -52,3 +55,13 @@
 (loop for i from 16 to 31
    do
      (print (unit i)))
+
+(defun random-color ()
+  (sdl:color :r (random 255) :g (random 255) :b (random 255)))
+
+(defun setup ()
+  (loop for h from 1 to *window-height*
+       do
+       (loop for w from 1 to *window-width*
+	  do
+	    (draw-pixel (sdl:point :x w :y h) :color (random-color)))))
