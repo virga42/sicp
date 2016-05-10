@@ -4,15 +4,7 @@
 (in-package :nature)
 
 (defun lerp (p0 p1 x)
-  (+ (y-point p0) (* (- (y-point p1)
-		       (y-point p0))
-		    (/ (- x (x-point p0))
-		       (- (x-point p1) (x-point p0))))))
-
-(defparameter p0 (make-point 2 2))
-(defparameter p1 (make-point 5 5))
-
-(lerp p0 p1 3)
+  (* (+ p0 x) (- p1 p0)))
 
 (defun dot-geo (vect1 vect2)
   (* (cos (angle vect1 vect2))
@@ -43,25 +35,98 @@
 			    49 192 214  31 181 199 106 157 184  84 204 176 115 121 50 45 127  4 150 254 
 			    138 236 205 93 222 114 67 29 24 72 243 141 128 195 78 66 215 61 156 180))
 
-(defparameter g (make-array 32))
+(defparameter g (make-array 512))
 
-(dotimes (i 16 g)
+(dotimes (i 255 g)
   (setf (aref g i ) (aref permutation i))
-  (setf (aref g (+ i 16)) (aref permutation i)))
+  (setf (aref g (+ i 255)) (aref permutation i)))
 
 (defun unit (n)
-  (logand n 15))
+  (logand n 255))
 
-(loop for i from 16 to 31
-   do
-     (print (unit i)))
+(defun grad (hash x y z)
+  (let ((d (logand hash 15)))
+    (cond
+      ((= d 0) (+ x y))
+      ((= d 1) (+ (- x) y))
+      ((= d 2) (+ x (- y)))
+      ((= d 3) (+ (- x) (- y)))
+      ((= d 4) (+ x z))
+      ((= d 5) (+ (- x) z))
+      ((= d 6) (+ x (- z)))
+      ((= d 7) (+ (- x) (- z)))
+      ((= d 8) (+ y z))
+      ((= d 9) (+ (- y) z))
+      ((= d 10) (+ y (- z)))
+      ((= d 11) (+ (- y) (- z)))
+      ((= d 12) (+ y x))
+      ((= d 13) (+ (- y) z))
+      ((= d 14) (+ y (- x)))
+      ((= d 15) (+ (- y) (- z)))
+      (t 0))))
 
 (defun random-color ()
   (sdl:color :r (random 255) :g (random 255) :b (random 255)))
 
+(defun map-value-to-bluescale (v)
+  (let ((ramp (/ v 2)))
+    (cond
+      ((> ramp 1.0) 255)
+      ((< ramp 0) 0)
+      (t (floor (* 255.0 ramp))))))
+
+(defun blue-scale (v)
+  (let ((b (map-value-to-bluescale v)))
+    (sdl:color :r 0 :g 0 :b b)))
+
 (defun setup ()
-  (loop for h from 1 to *window-height*
+  (sdl:clear-display *white*)
+  (loop for h from 1 to 50 by .1
        do
-       (loop for w from 1 to *window-width*
+       (loop for w from 1 to 50 by .1
 	  do
-	    (draw-pixel (sdl:point :x w :y h) :color (random-color)))))
+	    (progn
+	      ;; (format t "~a scale ~a val ~a x ~a y~%" (map-value-to-bluescale (perlin h w 0))
+	      ;; 	      (perlin h w 0)
+	      ;; 	      h
+	      ;; 	      w)
+	      (draw-pixel (sdl:point :x (round (* w 10))
+				     :y (round (* h 10)))
+				     :color (blue-scale (perlin h w 0))))))
+       (update-display))
+
+(defun perlin (x y z)
+  (let* ((xi (unit (floor x)))
+	 (yi (unit (floor y)))
+	 (zi (unit (floor z)))
+	 (xf (- x (floor x)))
+	 (yf (- y (floor y)))
+	 (zf (- z (floor z)))
+	 (u (fade xf))
+	 (v (fade yf))
+	 (w (fade zf))
+	 (aaa (aref g (+ (aref g (+ (aref g xi) yi)) zi)))
+	 (aba (aref g (+ (aref g (+ (aref g xi) (1+ yi))) zi)))
+	 (aab (aref g (+ (aref g (+ (aref g xi) yi)) (1+ zi))))
+	 (abb (aref g (+ (aref g (+ (aref g xi) (1+ yi))) (1+ zi))))
+	 (baa (aref g (+ (aref g (+ (aref g (1+ xi)) yi)) zi)))
+	 (bba (aref g (+ (aref g (+ (aref g (1+ xi)) (1+ yi))) zi)))
+	 (bab (aref g (+ (aref g (+ (aref g (1+ xi)) yi)) (1+ zi))))
+	 (bbb (aref g (+ (aref g (+ (aref g (1+ xi)) (1+ yi))) (1+ zi))))
+	 (x1-y1 (lerp (grad aaa xf yf zf)
+		   (grad baa (1- xf) yf zf)
+		   u))
+	 (x2-y1 (lerp (grad aba xf (1- yf) zf)
+		   (grad bba (1- xf) (1- yf) zf)
+		   u))
+	 (y1 (lerp x1-y1 x2-y1 v))
+	 (x1-y2 (lerp (grad aab xf yf (1- zf))
+		   (grad bab (1- xf) yf (1- zf))
+		   u))
+	 (x2-y2 (lerp (grad abb xf (1- yf) (1- zf))
+		   (grad bbb (1- xf) (1- yf) (1- zf))
+		   u))
+	 (y2 (lerp x1-y2 x2-y2 v)))
+    (/ (+ (lerp y1 y2 v) 1) 2)))
+
+
