@@ -74,7 +74,7 @@
 
 (defun blue-scale (v)
   (let ((b (map-value-to-bluescale v)))
-    (sdl:color :r 0 :g 0 :b b)))
+    (sdl:color :r b :g b :b 255)))
 
 (defun setup ()
   (sdl:clear-display *white*)
