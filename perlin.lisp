@@ -3,24 +3,6 @@
 
 (in-package :nature)
 
-(defun lerp (p0 p1 x)
-  (* (+ p0 x) (- p1 p0)))
-
-(defun dot-geo (vect1 vect2)
-  (* (cos (angle vect1 vect2))
-     (vector-length vect1)
-     (vector-length vect2)))
-
-(defun dot-alg (vect1 vect2)
-  (+ (* (car vect1) (car vect2))
-     (* (cdr vect1) (cdr vect2))))
-
-(defun vector-length (vector)
-  ())
-
-(defun fade (tr)
-  (* tr tr tr (+ (* tr (- (* tr 6) 15)) 10)))
-
 (defparameter permutation #(151 160 137 91 90 15 
 			    131 13 201 95 96 53 194 233 7 225 140 36 103 30 69 142 8 99 37 240 21 10 23 
 			    190  6 148 247 120 234 75 0 26 197 62 94 252 219 203 117 35 11 32 57 177 33 
@@ -40,6 +22,24 @@
 (dotimes (i 255 g)
   (setf (aref g i ) (aref permutation i))
   (setf (aref g (+ i 255)) (aref permutation i)))
+
+(defun lerp (p0 p1 x)
+  (* (+ p0 x) (- p1 p0)))
+
+(defun dot-geo (vect1 vect2)
+  (* (cos (angle vect1 vect2))
+     (vector-length vect1)
+     (vector-length vect2)))
+
+(defun dot-alg (vect1 vect2)
+  (+ (* (car vect1) (car vect2))
+     (* (cdr vect1) (cdr vect2))))
+
+(defun vector-length (vector)
+  ())
+
+(defun fade (tr)
+  (* tr tr tr (+ (* tr (- (* tr 6) 15)) 10)))
 
 (defun unit (n)
   (logand n 255))
@@ -65,15 +65,12 @@
       ((= d 15) (+ (- y) (- z)))
       (t 0))))
 
-(defun random-color ()
-  (sdl:color :r (random 255) :g (random 255) :b (random 255)))
-
 (defun map-value-to-bluescale (v)
-  (let ((ramp (/ v 2)))
+  (let ((ramp (/ (abs v) 2)))
     (cond
-      ((> ramp 1.0) 255)
+      ((> ramp 2.0) 255)
       ((< ramp 0) 0)
-      (t (floor (* 255.0 ramp))))))
+      (t (floor (* 127.0 ramp))))))
 
 (defun blue-scale (v)
   (let ((b (map-value-to-bluescale v)))
@@ -92,7 +89,7 @@
 	      ;; 	      w)
 	      (draw-pixel (sdl:point :x (round (* w 10))
 				     :y (round (* h 10)))
-				     :color (blue-scale (perlin h w 0))))))
+				     :color (blue-scale (perlin w h 0))))))
        (update-display))
 
 (defun perlin (x y z)
@@ -114,19 +111,19 @@
 	 (bab (aref g (+ (aref g (+ (aref g (1+ xi)) yi)) (1+ zi))))
 	 (bbb (aref g (+ (aref g (+ (aref g (1+ xi)) (1+ yi))) (1+ zi))))
 	 (x1-y1 (lerp (grad aaa xf yf zf)
-		   (grad baa (1- xf) yf zf)
-		   u))
+		      (grad baa (1- xf) yf zf)
+		      u))
 	 (x2-y1 (lerp (grad aba xf (1- yf) zf)
-		   (grad bba (1- xf) (1- yf) zf)
-		   u))
+		      (grad bba (1- xf) (1- yf) zf)
+		      u))
 	 (y1 (lerp x1-y1 x2-y1 v))
 	 (x1-y2 (lerp (grad aab xf yf (1- zf))
-		   (grad bab (1- xf) yf (1- zf))
-		   u))
+		      (grad bab (1- xf) yf (1- zf))
+		      u))
 	 (x2-y2 (lerp (grad abb xf (1- yf) (1- zf))
-		   (grad bbb (1- xf) (1- yf) (1- zf))
-		   u))
+		      (grad bbb (1- xf) (1- yf) (1- zf))
+		      u))
 	 (y2 (lerp x1-y2 x2-y2 v)))
-    (/ (+ (lerp y1 y2 v) 1) 2)))
+    (/ (+ (lerp y1 y2 w) 1) 2)))
 
 
