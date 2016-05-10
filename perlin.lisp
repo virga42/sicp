@@ -24,7 +24,7 @@
   (setf (aref g (+ i 255)) (aref permutation i)))
 
 (defun lerp (p0 p1 x)
-  (* (+ p0 x) (- p1 p0)))
+  (+ p0 (* x (- p1 p0))))
 
 (defun dot-geo (vect1 vect2)
   (* (cos (angle vect1 vect2))
@@ -66,11 +66,11 @@
       (t 0))))
 
 (defun map-value-to-bluescale (v)
-  (let ((ramp (/ (abs v) 2)))
+  (let ((ramp (abs v)))
     (cond
-      ((> ramp 2.0) 255)
+      ((> ramp 1.0) 255)
       ((< ramp 0) 0)
-      (t (floor (* 127.0 ramp))))))
+      (t (floor (* 255 ramp))))))
 
 (defun blue-scale (v)
   (let ((b (map-value-to-bluescale v)))
@@ -88,8 +88,9 @@
 	      ;; 	      h
 	      ;; 	      w)
 	      (draw-pixel (sdl:point :x (round (* w 10))
-				     :y (round (* h 10)))
-				     :color (blue-scale (perlin w h 0))))))
+	      			     :y (round (* h 10)))
+	      			     :color (blue-scale (perlin w h 0)))
+	      )))
        (update-display))
 
 (defun perlin (x y z)
@@ -124,6 +125,17 @@
 		      (grad bbb (1- xf) (1- yf) (1- zf))
 		      u))
 	 (y2 (lerp x1-y2 x2-y2 v)))
-    (/ (+ (lerp y1 y2 w) 1) 2)))
+    ;;(format t "~a y1: ~a y2: ~a~% " (list aaa aba aab abb baa bba bab bbb) y1 y2)
+    (/ (+ (lerp y1 y2 w) 1) 2)
+    ))
 
 
+;; (let ((stream (open "~/bottega/sicp/output2.txt" :direction
+;; 		    :output :if-exists :supersede)))
+;;   (loop for h from 1 to 5 by .1
+;;        do
+;;        (loop for w from 1 to 5 by .1
+;; 	  do (progn
+;; 	       (write-to-string (perlin w h 0) stream)
+;; 	       (terpri stream))))
+;;   (close stream))
