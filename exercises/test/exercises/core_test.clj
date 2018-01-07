@@ -25,3 +25,53 @@
     (is (= 25 (sum-squares-largest 2 3 4)))
     (is (= 18 (sum-squares-largest 2 3 3)))     ;dupe vals
     (is (= 17 (sum-squares-largest -1 -3 4))))) ;neg vals
+
+(deftest test-average
+  (testing "returns the average of two numbers"
+    (is (= 6 (average 4 8)))
+    (is (= 15 (average 10 20)))))
+
+(deftest test-improve
+  (testing "averaging quotient and radicand produces improved guess"
+    (is (== 1.5 (/ (+ 2 1) 2)))))
+
+(deftest test-sqrt-iter
+  (testing "producing the square root of a number"
+    (is (let [eps 0.00000001
+              result (sqrt-iter 1.0 16)]
+          (or (< (- 4 eps) result)
+              (> (+ 4 eps) result))))))
+
+(deftest test-sqrt-iter2
+  (testing "producing the square root of a number; modified version"
+    (is (let [eps 0.001
+              result (sqrt-iter2 1.0 16)]
+          (or (< (- 4 eps) result)
+              (> (+ 4 eps)) result)))
+    (is (let [eps 0.001
+              result (sqrt-iter2 1.0 10000000000000)]
+          (or (< (- 3162277.66017 eps) result)
+              (> (+ 3162277.66017 eps)) result)))
+    (is (let [eps 0.001
+              result (sqrt-iter2 0.002 0.000005)]
+          (or (< (- 0.00223606797 eps) result)
+              (> (+ 0.00223606797 eps)) result)))))
+
+(deftest test-cubert-iter2
+  (testing "producing the cube root of a number"
+    (is (let [eps 0.001
+              result (cubert-iter2 1.0 9)]
+          (or (< (- 3 eps) result)
+              (> (+ 3 eps)) result)))
+    (is (let [eps 0.001
+              result (cubert-iter2 1.0 729)]
+          (or (< (- 9 eps) result)
+              (> (+ 9 eps)) result)))
+    (is (let [eps 0.001
+              result (cubert-iter2 1.0 1000000)]
+          (or (< (- 100 eps) result)
+              (> (+ 100 eps)) result)))
+    (is (let [eps 0.001
+              result (cubert-iter2 0.0002 0.0000000005)]
+          (or (< (- 0.000793701 eps) result)
+              (> (+ 0.000793701 eps)) result)))))

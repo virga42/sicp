@@ -155,5 +155,92 @@
 ;; ==============
 ;; Exercise 1.6
 ;; ==============
-;
-;
+
+;; Number -> Number
+;; interp. returns the absolute value of a given number
+(defn abs
+  [x]
+  (if (< x 0)
+    (- x)
+    x))
+
+;; Number Number -> Number
+;; interp. produce the average of two numbers
+(defn average
+  [x y]
+  (/ (+ x y) 2))
+
+;; Number Number -> Number
+;; interp. produce a better guess by averaging original guess with given number/original guess
+(defn improve
+  [guess x]
+  (average guess (/ x guess)))
+
+;; Number Number -> Boolean
+;; returns true if a guess is within a given tolerance
+(defn good-enough?
+  [guess x]
+  (< (abs (- (square guess) x)) 0.001))
+
+;; Number Number -> Number
+;; interp. produce the square root of a number using Newton's method of successive
+;; approximations. guess is an initial guess, x is radicand
+(defn sqrt-iter
+  [guess x]
+  (if (good-enough? guess x)
+    guess
+    (sqrt-iter (improve guess x)
+               x)))
+
+; What happens when Alyssa attempts to use this to compute square roots?
+
+; She will receive an error because new-if uses applicative-order; the program
+; will not complete. The else-clause will always be evaluated and since it is
+; recursive the computer will run out of memory.
+
+;; ==============
+;; Exercise 1.7
+;; ==============
+
+; Design a square-root procedure that uses an end test that stops when there
+; is only a small fraction of change from guess to the next
+
+(defn good-enough2?
+  [old-guess new-guess x]
+  (< 0.001 (- (/ new-guess x) (/ old-guess x))))
+
+(defn sqrt-iter2
+ [guess x]
+ (letfn [(sqrt-iter [old-guess new-guess x]
+                    (cond
+                      (good-enough2? old-guess new-guess x) new-guess
+                      :else (sqrt-iter new-guess (improve new-guess x))))]
+        (sqrt-iter guess (improve guess x) x)))
+
+;; ==============
+;; Exercise 1.8
+;; ==============
+
+; Newton's method for cube roots is based on the fact that if y is an
+; approximation to the cube root of x, then a better approximation is given by
+; the evaluated x/y^2 + 2y / 3
+; Use this formulat to implement a cube-root procedure analagous to the
+; square-root procedures
+
+;; Number Number -> Number
+;; produce a better approximation of a cube root by averaging old guess with
+;; new guess using Newton's approximation for cube roots
+(defn improve-cube
+  [guess x]
+  (average guess (/ (+ (/ x (square guess)) (* 2 guess)) 3)))
+
+;; Number Number -> Number
+;; interp. produce the cube root of a number using Newton's method of successive
+;; approximations. guess is an initial guess, x is radicand
+(defn cubert-iter2
+ [guess x]
+ (letfn [(cubert-iter [old-guess new-guess x]
+                    (cond
+                      (good-enough2? old-guess new-guess x) new-guess
+                      :else (cubert-iter new-guess (improve-cube new-guess x))))]
+        (cubert-iter guess (improve-cube guess x) x)))
