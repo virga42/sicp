@@ -244,3 +244,55 @@
                       (good-enough2? old-guess new-guess x) new-guess
                       :else (cubert-iter new-guess (improve-cube new-guess x))))]
         (cubert-iter guess (improve-cube guess x) x)))
+
+
+;; ==============
+;; Exercise 1.9
+;; ==============
+
+(defn +
+  [a b]
+  (cond (= a 0) b
+    :else (inc (+ (dec a) b))))
+; is a linear recursive process; for example (+ 2 2) produces the following shape
+; (inc (+ 1 2))
+; (inc (inc (+ 0 2)))
+; (inc (inc 2))
+; => 4
+
+; it is characterized as having a chain of deferred calls to inc. the number of
+; deferred calls to inc is proportional to the size of a; a very large a would
+; have negative performance.
+
+(defn +
+  [a b]
+  (cond (= a 0) b
+    :else (+ (dec a) (inc b))))
+; is a linear iterative process; for example (+ 2 2) produces the following shape
+; (+ 1 3) - result of (+ (dec 2) (inc 2))
+; (+ 0 4) - result of (+ (dec 1) (inc 3))
+; => 4
+
+; it is characterized has having fixed size; the number of steps to resolve is linear
+; to the size of a
+
+;; ==============
+;; Exercise 1.10
+;; ==============
+
+(defn A
+  [x y]
+  (cond
+    (= y 0) 0
+    (= x 0) (* 2 y)
+    (= y 1) 2
+    :else (A (- x 1)
+             (A x (- y 1)))))
+
+; (defn f [n] (A 0 n)) represents 2*n
+; (defn g [n] (A 1 n)) represents 2^n
+; (defn h [n] (A 2 n)) represents 2^2...{n-1 times}
+
+;; ==============
+;; Exercise 1.11
+;; ==============
