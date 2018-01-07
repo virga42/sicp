@@ -96,6 +96,11 @@
   (+ (square (first  (largest2 x y z)))
      (square (second (largest2 x y z)))))
 
+(defn sum-squares
+  [x y z]
+  (reduce + (map (fn [n] (square n)) (list (max x y)
+                                           (max (min x y) z)))))
+
 ;; ==============
 ;; Exercise 1.4
 ;; ==============
@@ -207,14 +212,14 @@
 
 (defn good-enough2?
   [old-guess new-guess x]
-  (< 0.001 (- (/ new-guess x) (/ old-guess x))))
+  (> 0.001 (- (/ new-guess x) (/ old-guess x))))
 
 (defn sqrt-iter2
  [guess x]
  (letfn [(sqrt-iter [old-guess new-guess x]
                     (cond
                       (good-enough2? old-guess new-guess x) new-guess
-                      :else (sqrt-iter new-guess (improve new-guess x))))]
+                      :else (sqrt-iter new-guess (improve new-guess x) x)))]
         (sqrt-iter guess (improve guess x) x)))
 
 ;; ==============
@@ -242,7 +247,7 @@
  (letfn [(cubert-iter [old-guess new-guess x]
                     (cond
                       (good-enough2? old-guess new-guess x) new-guess
-                      :else (cubert-iter new-guess (improve-cube new-guess x))))]
+                      :else (cubert-iter new-guess (improve-cube new-guess x) x)))]
         (cubert-iter guess (improve-cube guess x) x)))
 
 
