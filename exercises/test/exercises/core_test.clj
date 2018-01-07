@@ -53,7 +53,7 @@
           (or (< (- 3162277.66017 eps) result)
               (> (+ 3162277.66017 eps)) result)))
     (is (let [eps 0.001
-              result (sqrt-iter2 0.002 0.000005)]
+              result (sqrt-iter2 1.0 0.000005)]
           (or (< (- 0.00223606797 eps) result)
               (> (+ 0.00223606797 eps)) result)))))
 

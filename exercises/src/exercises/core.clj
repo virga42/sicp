@@ -110,7 +110,7 @@
 
 ; the body is substituted with the given arguments then the leftmost subexpression
 ; (in this case the operator is a special form, if) is evaluated which produces
-; a primitive. The operator is then evaluated with the provide operands, a and b.
+; a primitive. The operator is then evaluated with the provided operands, a and b.
 
 ;; (a-plus-abs-b 3 4) returns 7. Since b is greater than 0 the expression becomes
 ;; (+ 3 4)
