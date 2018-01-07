@@ -48,10 +48,10 @@
 
 (deftest test-sqrt-iter2
   (testing "producing the square root of a number; modified version"
-    (is (close-enough? 4 (sqrt-iter2 1.0 16)))
+    (is (close-enough? 4 (sqrt-iter2 1.0 16)))))
     ; (is (close-enough? 3162277.66017 (sqrt-iter2 1.0 10000000000000)))
     ; (is (close-enough? 0.00223606797 (sqrt-iter2 1.0 0.000005)))
-    ))
+
 ;
 ; (deftest test-cubert-iter2
 ;   (testing "producing the cube root of a number"

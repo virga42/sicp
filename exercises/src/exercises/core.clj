@@ -212,7 +212,7 @@
 
 (defn good-enough2?
   [old-guess new-guess x]
-  (> 0.001 (- (/ new-guess x) (/ old-guess x))))
+  (> 0.001 (Math/abs (/ (- old-guess new-guess) old-guess))))
 
 (defn sqrt-iter2
  [guess x]
